@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Admin Workspace</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght=300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- 1. Admin Login -->
+    <div class="container" id="login-section">
+        <div class="portal-header">
+            <div class="logo-icon"><i class="fa-solid fa-lock"></i></div>
+            <h2>Admin Workspace</h2>
+            <p style="color: var(--text-muted);">Secure Mobile Authentication</p>
+        </div>
+        <div class="input-group" style="margin-top: 20px;">
+            <div class="input-wrapper">
+                <i class="fa-solid fa-key input-icon"></i>
+                <input type="password" id="adminPassword" placeholder="Enter Security Password">
+            </div>
+        </div>
+        <button class="btn check-in" style="width: 100%; margin-bottom: 12px;" onclick="loginAdmin()">
+            <i class="fa-solid fa-unlock"></i> Authenticate
+        </button>
+        <p id="login-error" class="error-text" style="text-align: center; margin-top: 10px; color: #ef4444;"></p>
+    </div>
+
+    <!-- 2. Main App Content Wrapper -->
+    <div class="app-wrapper hidden" id="dashboard-section">
+        <header class="app-top-bar">
+            <div class="top-brand"><i class="fa-solid fa-graduation-cap"></i><h2>Workspace</h2></div>
+            <div class="top-actions">
+                <a href="index.html" class="top-icon-btn"><i class="fa-solid fa-arrow-left"></i></a>
+                <button class="top-icon-btn logout" onclick="logoutAdmin()"><i class="fa-solid fa-power-off"></i></button>
+            </div>
+        </header>
+
+        <main class="app-main-content">
+            <!-- WORKSPACE: ATTENDANCE -->
+            <div id="attendance-panel-section" class="workspace-pane">
+                <div class="pane-header-title"><h3><i class="fa-solid fa-calendar-check"></i> Attendance Tracking</h3></div>
+                <div class="stats-grid" style="grid-template-columns: repeat(2, 1fr);">
+                    <div class="stat-card green-card"><div class="stat-info"><h3 id="total-checkins">0</h3><p>Check-Ins Today</p></div></div>
+                    <div class="stat-card red-card"><div class="stat-info"><h3 id="total-checkouts">0</h3><p>Check-Outs Today</p></div></div>
+                    <div class="stat-card" style="border-left: 4px solid var(--primary);"><div class="stat-info"><h3 id="total-occupied-seats">0</h3><p>Occupied Seats</p></div></div>
+                    <div class="stat-card" style="border-left: 4px solid #f59e0bを確認します。"><div class="stat-info"><h3 id="total-defaulters" style="color: #f59e0b;">0</h3><p style="white-space: nowrap;">Fees Pending</p></div></div>
+                </div>
+                <div class="search-bar"><i class="fa-solid fa-magnifying-glass search-icon"></i><input type="text" id="searchHistory" placeholder="Search logs..." onkeyup="filterLogs()"></div>
+                <div class="table-card"><div class="table-responsive"><table class="log-table"><thead><tr><th>Student ID & Name</th><th>In / Out Timing (Single Row)</th><th>Operation</th></tr></thead><tbody id="log-table-body"></tbody></table></div></div>
+                <button class="btn check-out long-btn" onclick="clearLogs()"><i class="fa-solid fa-trash-can"></i> Wipeout Logs</button>
+            </div>
+
+            <!-- WORKSPACE: ADMISSIONS & FEES -->
+            <div id="admission-panel-section" class="workspace-pane hidden">
+                <div class="pane-header-title"><h3><i class="fa-solid fa-users-gear"></i> Admissions & Finances</h3></div>
+                <div class="mobile-stack-layout">
+                    <div class="app-card-form">
+                        <h4><i class="fa-solid fa-user-plus"></i> New Enrollment</h4>
+                        <div class="input-group"><input type="text" id="adm-name" placeholder="Student Name / Roll No."></div>
+                        <div class="input-group"><input type="date" id="adm-date"></div>
+                        <div class="input-group"><input type="tel" id="adm-phone" placeholder="Contact Mobile Number"></div>
+                        <div class="input-group"><input type="text" id="adm-address" placeholder="Residential Address"></div>
+                        <button class="btn check-in" style="width: 100%;" onclick="registerStudent()"><i class="fa-solid fa-save"></i> Save Profile</button>
+                    </div>
+                    <div class="app-card-list">
+                        <div class="list-title-area"><h4><i class="fa-solid fa-database"></i> Registered Scholars</h4></div>
+                        <div class="table-responsive"><table class="log-table"><thead><tr><th>Student</th><th>Adm Date</th><th>Contact</th><th>Fees</th><th>Action</th></tr></thead><tbody id="admission-table-body"></tbody></table></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- WORKSPACE: SEAT ALLOTMENT -->
+            <div id="seats-panel-section" class="workspace-pane hidden">
+                <div class="pane-header-title"><h3><i class="fa-solid fa-chair"></i> Seat Inventory</h3></div>
+                <div class="mobile-stack-layout">
+                    <div class="app-card-form">
+                        <h4><i class="fa-solid fa-circle-plus"></i> Allocate Cubicle</h4>
+                        <div class="input-group"><select id="seat-student-select" class="mobile-select"></select></div>
+                        <div class="input-group"><input type="number" id="seat-number-input" placeholder="Enter Seat Number Only"></div>
+                        <button class="btn check-in" style="width: 100%;" onclick="allocateSeat()"><i class="fa-solid fa-check"></i> Assign Desk</button>
+                    </div>
+                    <div class="app-card-list">
+                        <h4><i class="fa-solid fa-border-all"></i> Seating Grid Log</h4>
+                        <div class="table-responsive"><table class="log-table"><thead><tr><th>💺 ID</th><th>Occupant</th><th>Status</th><th>Operation</th></tr></thead><tbody id="seat-table-body"></tbody></table></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <div class="bottom-nav">
+            <button id="tab-btn-attendance" class="nav-item active" onclick="switchTab('attendance')"><i class="fa-solid fa-clock-rotate-left"></i><span>Attendance</span></button>
+            <button id="tab-btn-admission" class="nav-item" onclick="switchTab('admission')"><i class="fa-solid fa-user-group"></i><span>Admissions</span></button>
+            <button id="tab-btn-seats" class="nav-item" onclick="switchTab('seats')"><i class="fa-solid fa-chair"></i><span>Seats</span></button>
+            <button id="tab-btn-security" class="nav-item" onclick="openPasswordModal()"><i class="fa-solid fa-key"></i><span>Password</span></button>
+        </div>
+    </div>
+    <!-- Modals -->
+    <div id="historyModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header"><h3>Attendance History</h3><span class="close-btn" onclick="closeHistoryModal()">&times;</span></div>
+            <div class="modal-body"><h4 id="history-student-name" style="margin-bottom: 10px; color: var(--primary);"></h4><div class="table-responsive"><table class="log-table"><thead><tr><th>Date</th><th>Time</th><th>Activity</th></tr></thead><tbody id="history-table-body"></tbody></table></div></div>
+        </div>
+    </div>
+
+    <div id="passwordModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header"><h3>Reset Credentials</h3><span class="close-btn" onclick="closePasswordModal()">&times;</span></div>
+            <div class="modal-body">
+                <div class="input-group"><input type="password" id="current-password-input" placeholder="Current Password"></div>
+                <div class="input-group"><input type="password" id="new-password-input" placeholder="New Password"></div>
+                <div class="input-group"><input type="password" id="confirm-password-input" placeholder="Confirm New Password"></div>
+                <button class="btn check-in" style="width: 100%;" onclick="updateAdminPassword()">Update Gateway</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const DB_URL = "https://genius-library-bcc4a-default-rtdb.firebaseio.com/";
+        let isRenderingSeats = false; 
+
+        async function fetchFromDB(node) {
+            try { let response = await fetch(`${DB_URL}${node}.json`); return response.ok ? await response.json() : null; } 
+            catch (e) { console.error(e); return null; }
+        }
+        async function saveToDB(node, data) {
+            try { await fetch(`${DB_URL}${node}.json`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }); } 
+            catch (e) { console.error(e); }
+        }
+
+        async function loginAdmin() {
+            const passwordInput = document.getElementById("adminPassword").value;
+            const errorMsg = document.getElementById("login-error");
+            if (passwordInput === "genius123") {
+                errorMsg.innerText = "";
+                document.getElementById("login-section").classList.add("hidden");
+                document.getElementById("dashboard-section").classList.remove("hidden");
+                loadDashboardData(); return;
+            }
+            let pwdNode = await fetchFromDB('adminConfig');
+            let correctPassword = (pwdNode && pwdNode.password) ? pwdNode.password : "genius123";
+            if (passwordInput === correctPassword) {
+                errorMsg.innerText = "";
+                document.getElementById("login-section").classList.add("hidden");
+                document.getElementById("dashboard-section").classList.remove("hidden");
+                loadDashboardData();
+            } else { errorMsg.innerHTML = "❌ Invalid Security Credentials!"; }
+        }
+
+        function logoutAdmin() {
+            document.getElementById("adminPassword").value = "";
+            document.getElementById("dashboard-section").classList.add("hidden");
+            document.getElementById("login-section").classList.remove("hidden");
+        }
+        async function loadDashboardData() { await autoCheckMonthlyDue(); await loadAttendanceLogs(); await loadAdmissionRecords(); await updateStudentDropdown(); await loadSeatAllocations(); calculateLiveAnalytics(); }
+
+        function switchTab(tabName) {
+            const tabs = ['attendance', 'admission', 'seats'];
+            tabs.forEach(t => { document.getElementById(`${t}-panel-section`).classList.add("hidden"); document.getElementById(`tab-btn-${t}`).classList.remove("active"); });
+            document.getElementById(`${tabName}-panel-section`).classList.remove("hidden"); document.getElementById(`tab-btn-${tabName}`).classList.add("active");
+            if(tabName === 'attendance') loadAttendanceLogs();
+            if(tabName === 'admission') { autoCheckMonthlyDue(); loadAdmissionRecords(); }
+            if(tabName === 'seats') { updateStudentDropdown(); loadSeatAllocations(); }
+            calculateLiveAnalytics();
+        }
+
+        async function calculateLiveAnalytics() {
+            let seatData = await fetchFromDB("seatAllocations") || [];
+            let admissionData = await fetchFromDB("admissionRecords") || [];
+            if(!Array.isArray(seatData)) seatData = Object.values(seatData).filter(Boolean);
+            if(!Array.isArray(admissionData)) admissionData = Object.values(admissionData).filter(Boolean);
+            document.getElementById("total-occupied-seats").innerText = seatData.length;
+            document.getElementById("total-defaulters").innerText = admissionData.filter(s => s.payment === "Due").length;
+        }
+        async function autoCheckMonthlyDue() {
+            let data = await fetchFromDB("admissionRecords") || [];
+            if(!Array.isArray(data)) data = Object.values(data).filter(Boolean);
+            if (data.length === 0) return;
+            let updated = false; const today = new Date();
+            data.forEach(student => {
+                if (student.date && student.payment === "Paid") {
+                    const admDate = new Date(student.date);
+                    const diffDays = Math.ceil(Math.abs(today - admDate) / (1000 * 60 * 60 * 24));
+                    if (diffDays >= 30) { student.payment = "Due"; updated = true; }
+                }
+            });
+            if (updated) { await saveToDB("admissionRecords", data); }
+        }
+
+        // ⚡ नया मर्जिंग अटेंडेंस इंजन: एक स्टूडेंट का डेटा सिर्फ एक लाइन में दिखाएगा
+        async function loadAttendanceLogs() {
+            const tableBody = document.getElementById("log-table-body"); tableBody.innerHTML = "";
+            let attendanceData = await fetchFromDB("attendanceLogs") || [];
+            if(!Array.isArray(attendanceData)) attendanceData = Object.values(attendanceData).filter(Boolean);
+            
+            const today = new Date().toLocaleDateString('en-IN');
+            let ins = 0, outs = 0;
+            attendanceData.forEach(r => { if(r.date === today) { r.type === "Check-In" ? ins++ : outs++; } });
+            document.getElementById("total-checkins").innerText = ins; document.getElementById("total-checkouts").innerText = outs;
+            
+            if (attendanceData.length === 0) { tableBody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:var(--text-muted); padding:30px;">No logs found.</td></tr>`; return; }
+            
+            // तारीख के हिसाब से ग्रुप करें
+            let dateGrouped = {}; 
+            [...attendanceData].reverse().forEach(log => { 
+                if (!dateGrouped[log.date]) dateGrouped[log.date] = []; 
+                dateGrouped[log.date].push(log); 
+            });
+
+            Object.keys(dateGrouped).forEach(date => {
+                const dateHeader = document.createElement("tr");
+                dateHeader.innerHTML = `<td colspan="3" style="background: rgba(79, 70, 229, 0.15); color: var(--primary); font-weight: 700; padding: 10px; text-align: left; border-left: 4px solid var(--primary);"><i class="fa-solid fa-calendar-day"></i> Attendance Date: ${date}</td>`;
+                tableBody.appendChild(dateHeader);
+
+                // तारीख के अंदर स्टूडेंट्स के लॉग्स को मर्ज करने का लॉजिक
+                let studentMerged = {};
+                dateGrouped[date].forEach(record => {
+                    const studentKey = record.id.toLowerCase();
+                    if (!studentMerged[studentKey]) {
+                        studentMerged[studentKey] = { id: record.id, name: record.name, checkInTime: "--", checkOutTime: "--" };
+                    }
+                    if (record.type === "Check-In") studentMerged[studentKey].checkInTime = record.time;
+                    if (record.type === "Check-Out") studentMerged[studentKey].checkOutTime = record.time;
+                });
+
+                // स्क्रीन पर रेंडर करना (सिंगल लाइन लेआउट)
+                Object.values(studentMerged).forEach(student => {
+                    const row = document.createElement("tr");
+                    row.innerHTML = `
+                        <td style="padding: 12px 8px;"><strong>${student.id.toUpperCase()}</strong><br><small>${student.name}</small></td>
+                        <td style="padding: 12px 8px; vertical-align: middle;">
+                            <div style="display: flex; flex-direction: column; gap: 6px; white-space: nowrap;">
+                                <div style="display: inline-flex; align-items: center; gap: 6px;">
+                                    <span class="status-badge status-in" style="margin: 0; padding: 2px 6px; font-size: 10px; width: 65px; text-align: center;">Check-In</span>
+                                    <span class="time-tag" style="margin: 0; padding: 2px 6px; font-size: 11px;">${student.checkInTime}</span>
+                                </div>
+                                <div style="display: inline-flex; align-items: center; gap: 6px;">
+                                    <span class="status-badge status-out" style="margin: 0; padding: 2px 6px; font-size: 10px; width: 65px; text-align: center;">Check-Out</span>
+                                    <span class="time-tag" style="margin: 0; padding: 2px 6px; font-size: 11px;">${student.checkOutTime}</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td style="padding: 12px 8px; vertical-align: middle;"><button class="btn-history" onclick="showHistory('${student.id}')">History</button></td>`;
+                    tableBody.appendChild(row);
+                });
+            });
+        }
+
+        async function showHistory(studentId) {
+            const modal = document.getElementById("historyModal"); document.getElementById("history-student-name").innerText = `ID: ${studentId.toUpperCase()}`;
+            const tbody = document.getElementById("history-table-body"); tbody.innerHTML = "";
+            let data = await fetchFromDB("attendanceLogs") || [];
+            if(!Array.isArray(data)) data = Object.values(data).filter(Boolean);
+            let studentHistory = data.filter(r => r.id.toLowerCase() === studentId.toLowerCase()).reverse();
+            if(studentHistory.length === 0) { tbody.innerHTML = "<tr><td colspan='3' style='text-align:center;'>No historical records.</td></tr>"; } 
+            else { studentHistory.forEach(h => { tbody.innerHTML += `<tr><td>${h.date}</td><td><span class="time-tag">${h.time}</span></td><td><span class="status-badge ${h.type==='Check-In'?'status-in':'status-out'}">${h.type}</span></td></tr>`; }); }
+            modal.classList.remove("hidden");
+        }
+        function closeHistoryModal() { document.getElementById("historyModal").classList.add("hidden"); }
+        function openPasswordModal() { document.getElementById("passwordModal").classList.remove("hidden"); }
+        function closePasswordModal() { document.getElementById("passwordModal").classList.add("hidden"); }
+
+        async function updateAdminPassword() {
+            const current = document.getElementById('current-password-input').value;
+            const newPwd = document.getElementById('new-password-input').value; const confirmPwd = document.getElementById('confirm-password-input').value;
+            let pwdNode = await fetchFromDB('adminConfig'); let correctPassword = (pwdNode && pwdNode.password) ? pwdNode.password : "genius123";
+            if(current !== correctPassword || newPwd !== confirmPwd || newPwd.trim() === "") { alert("Validation Error!"); return; }
+            await saveToDB('adminConfig', { password: newPwd }); alert("Password updated successfully!"); closePasswordModal(); logoutAdmin();
+        }
+        async function clearLogs() { if (confirm("Clear all attendance logs?")) { await saveToDB("attendanceLogs", {}); loadAttendanceLogs(); } }
+        function filterLogs() {
+            const searchInput = document.getElementById("searchHistory").value.toLowerCase();
+            const rows = document.getElementById("log-table-body").getElementsByTagName("tr");
+            for (let i = 0; i < rows.length; i++) { if(rows[i].cells.length < 3 || rows[i].cells[0].colSpan > 1) continue; rows[i].style.display = rows[i].cells[0].innerText.toLowerCase().includes(searchInput) ? "" : "none"; }
+        }
+
+        async function registerStudent() {
+            const name = document.getElementById("adm-name").value.trim(), date = document.getElementById("adm-date").value, phone = document.getElementById("adm-phone").value.trim(), address = document.getElementById("adm-address").value.trim();
+            if (!name || !date || !phone || !address) { alert("All fields are required!"); return; }
+            let admissionData = await fetchFromDB("admissionRecords") || [];
+            if(!Array.isArray(admissionData)) admissionData = Object.values(admissionData).filter(Boolean);
+            const uniqueId = "GL-" + (1001 + admissionData.length);
+            admissionData.push({ id: uniqueId, name, date, phone, address, payment: "Paid" });
+            await saveToDB("admissionRecords", admissionData); alert(`🎉 Unique ID Generated: ${uniqueId}`);
+            document.getElementById("adm-name").value = ""; loadAdmissionRecords();
+        }
+
+        async function loadAdmissionRecords() {
+            const tbody = document.getElementById("admission-table-body"); tbody.innerHTML = "";
+            let data = await fetchFromDB("admissionRecords") || []; if(!Array.isArray(data)) data = Object.values(data).filter(Boolean);
+            data.map((s, idx) => { return { ...s, idx }; }).reverse().forEach(s => {
+                const txt = s.payment === 'Paid' ? '<i class="fa-solid fa-xmark"></i> Mark Due' : '<i class="fa-solid fa-check"></i> Mark Paid';
+                const style = s.payment === 'Paid' ? 'background:#f97316; color:white; border:none;' : 'background:#22c55e; color:white; border:none;';
+                tbody.innerHTML += `<tr>
+                    <td><strong>${s.id}</strong><br>${s.name}</td><td>${s.date}</td>
+                    <td><i class="fa-solid fa-phone" style="color:var(--primary); font-size:11px;"></i> ${s.phone}<br><i class="fa-solid fa-house" style="color:#6b7280; font-size:11px;"></i> <small>${s.address}</small></td>
+                    <td><span class="status-badge ${s.payment==='Paid'?'status-in':'status-out'}">${s.payment}</span></td>
+                    <td><button class="btn-history" style="padding:5px 10px; font-size:11px; border-radius:6px; font-weight:600; ${style}" onclick="togglePaymentStatus(${s.idx}, '${s.payment==='Paid'?'Due':'Paid'}')">${txt}</button>
+                    <button class="btn-history" style="background:#ef4444; color:white; border:none; padding:5px 10px; font-size:11px; border-radius:6px; margin-top:5px;" onclick="removeAdmission(${s.idx})">Delete</button></td>
+                </tr>`;
+            });
+        }
+        async function togglePaymentStatus(index, status) { let data = await fetchFromDB("admissionRecords") || []; if(data[index]) { data[index].payment = status; await saveToDB("admissionRecords", data); loadAdmissionRecords(); calculateLiveAnalytics(); } }
+        async function removeAdmission(index) { if(confirm("Delete student admission?")) { let data = await fetchFromDB("admissionRecords") || []; if(data[index]) { data.splice(index, 1); await saveToDB("admissionRecords", data); loadAdmissionRecords(); calculateLiveAnalytics(); } } }
+
+        async function updateStudentDropdown() {
+            const select = document.getElementById("seat-student-select"); select.innerHTML = '<option value="">-- Choose Student ID --</option>';
+            let data = await fetchFromDB("admissionRecords") || []; if(!Array.isArray(data)) data = Object.values(data).filter(Boolean);
+            data.forEach(s => { select.innerHTML += `<option value="${s.id}">${s.id} - ${s.name}</option>`; });
+        }
+        async function allocateSeat() {
+            const studentId = document.getElementById("seat-student-select").value, seat = document.getElementById("seat-number-input").value.trim();
+            if(!studentId || !seat) return;
+            let seatData = await fetchFromDB("seatAllocations") || [], admData = await fetchFromDB("admissionRecords") || [];
+            let obj = Object.values(admData).find(s => s.id === studentId);
+            seatData.push({ studentId, studentName: obj.name, seat }); await saveToDB("seatAllocations", seatData);
+            document.getElementById("seat-number-input").value = ""; loadSeatAllocations(); calculateLiveAnalytics();
+        }
+        
+        async function loadSeatAllocations() {
+            if (isRenderingSeats) return; 
+            isRenderingSeats = true; 
+            const tbody = document.getElementById("seat-table-body"); tbody.innerHTML = ""; 
+            let data = await fetchFromDB("seatAllocations") || []; if(!Array.isArray(data)) data = Object.values(data).filter(Boolean);
+            const premiumColors = ["#ec4899", "#3b82f6", "#10b981", "#8b5cf6", "#f59e0b", "#06b6d4", "#f43f5e"];
+            data.forEach((item, idx) => {
+                const bg = premiumColors[idx % premiumColors.length];
+                tbody.innerHTML += `<tr>
+                    <td><span style="background:${bg}; color:white; padding:5px 14px; font-weight:700; border-radius:50px; font-size:13px; display:inline-block; min-width:55px; text-align:center;"><i class="fa-solid fa-chair" style="margin-right:3px;"></i> ${item.seat}</span></td>
+                    <td><strong>${item.studentId}</strong><br>${item.studentName}</td><td><span class="status-badge status-in">Allocated</span></td>
+                    <td><button class="btn-history" style="color:var(--danger);" onclick="vacateSeat(${idx})">Vacate</button></td>
+                </tr>`;
+            });
+            isRenderingSeats = false; 
+        }
+        async function vacateSeat(index) { if(confirm("Vacate this seat?")) { let data = await fetchFromDB("seatAllocations") || []; data.splice(index, 1); await saveToDB("seatAllocations", data); loadSeatAllocations(); calculateLiveAnalytics(); } }
+    </script>
+</body>
+</html>
