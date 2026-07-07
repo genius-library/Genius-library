@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Admin Workspace</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- 1. Admin Login -->
+    <div class="container" id="login-section">
+        <div class="portal-header">
+            <div class="logo-icon"><i class="fa-solid fa-lock"></i></div>
+            <h2>Admin Workspace</h2>
+            <p style="color: var(--text-muted);">Secure Mobile Authentication</p>
+        </div>
+        <div class="input-group" style="margin-top: 20px;">
+            <div class="input-wrapper">
+                <i class="fa-solid fa-key input-icon"></i>
+                <input type="password" id="adminPassword" placeholder="Enter Security Password">
+            </div>
+        </div>
+        <button class="btn check-in" style="width: 100%;" onclick="loginAdmin()">
+            <i class="fa-solid fa-unlock"></i> Authenticate
+        </button>
+        <p id="login-error" class="error-text"></p>
+    </div>
+
+    <!-- 2. Main App Content Wrapper -->
+    <div class="app-wrapper hidden" id="dashboard-section">
+        
+        <!-- TOP BRAND BAR -->
+        <header class="app-top-bar">
+            <div class="top-brand">
+                <i class="fa-solid fa-graduation-cap"></i>
+                <h2>Workspace</h2>
+            </div>
+            <div class="top-actions">
+                <a href="index.html" class="top-icon-btn" title="Student Portal"><i class="fa-solid fa-arrow-left"></i></a>
+                <button class="top-icon-btn logout" onclick="logoutAdmin()" title="Sign Out"><i class="fa-solid fa-power-off"></i></button>
+            </div>
+        </header>
+
+        <!-- MAIN MAIN PANEL DISPLAY -->
+        <main class="app-main-content">
+            
+            <!-- WORKSPACE: ATTENDANCE -->
+            <div id="attendance-panel-section" class="workspace-pane">
+                <div class="pane-header-title">
+                    <h3><i class="fa-solid fa-calendar-check"></i> Attendance Tracking</h3>
+                </div>
+
+                <!-- 4 कार्ड्स वाला नया प्रीमियम एनालिटिक्स ग्रिड -->
+                <div class="stats-grid" style="grid-template-columns: repeat(2, 1fr);">
+                    <div class="stat-card green-card">
+                        <div class="stat-info">
+                            <h3 id="total-checkins">0</h3>
+                            <p>Check-Ins Today</p>
+                        </div>
+                    </div>
+                    <div class="stat-card red-card">
+                        <div class="stat-info">
+                            <h3 id="total-checkouts">0</h3>
+                            <p>Check-Outs Today</p>
+                        </div>
+                    </div>
+                    <div class="stat-card" style="border-left: 4px solid var(--primary);">
+                        <div class="stat-info">
+                            <h3 id="total-occupied-seats">0</h3>
+                            <p>Occupied Seats</p>
+                        </div>
+                    </div>
+                    <div class="stat-card" style="border-left: 4px solid #f59e0b;">
+                        <div class="stat-info">
+                            <h3 id="total-defaulters" style="color: #f59e0b;">0</h3>
+                            <p style="white-space: nowrap;">Fees Pending</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="search-bar">
+                    <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                    <input type="text" id="searchHistory" placeholder="Search student logs..." onkeyup="filterLogs()">
+                </div>
+
+                <div class="table-card">
+                    <div class="table-responsive">
+                        <table class="log-table">
+                            <thead><!-- JS Header --></thead>
+                            <tbody id="log-table-body"><!-- Logs Injection --></tbody>
+                        </table>
+                    </div>
+                </div>
+                <button class="btn check-out long-btn" onclick="clearLogs()"><i class="fa-solid fa-trash-can"></i> Wipeout Logs</button>
+            </div>
+
+            <!-- WORKSPACE: ADMISSIONS & FEES -->
+            <div id="admission-panel-section" class="workspace-pane hidden">
+                <div class="pane-header-title">
+                    <h3><i class="fa-solid fa-users-gear"></i> Admissions & Finances</h3>
+                </div>
+
+                <div class="mobile-stack-layout">
+                    <div class="app-card-form">
+                        <h4><i class="fa-solid fa-user-plus"></i> New Enrollment</h4>
+                        <div class="input-group">
+                            <input type="text" id="adm-name" placeholder="Student Name / Roll No.">
+                        </div>
+                        <div class="input-group">
+                            <input type="date" id="adm-date">
+                        </div>
+                        <div class="input-group">
+                            <input type="tel" id="adm-phone" placeholder="Contact Mobile Number">
+                        </div>
+                        <div class="input-group">
+                            <input type="text" id="adm-address" placeholder="Residential Address">
+                        </div>
+                        <button class="btn check-in" style="width: 100%;" onclick="registerStudent()"><i class="fa-solid fa-save"></i> Save Profile</button>
+                    </div>
+
+                    <div class="app-card-list">
+                        <div class="list-title-area">
+                            <h4><i class="fa-solid fa-database"></i> Registered Scholars</h4>
+                            <button class="btn btn-secondary compact-btn" onclick="exportAdmissions()"><i class="fa-solid fa-file-excel"></i> CSV</button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="log-table">
+                                <thead>
+                                    <tr>
+                                        <th>Student</th>
+                                        <th>Adm Date</th>
+                                        <th>Contact / Address</th>
+                                        <th>Fees</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admission-table-body"><!-- JS Injects --></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- WORKSPACE: SEAT ALLOTMENT -->
+            <div id="seats-panel-section" class="workspace-pane hidden">
+                <div class="pane-header-title">
+                    <h3><i class="fa-solid fa-chair"></i> Seat Inventory</h3>
+                </div>
+
+                <div class="mobile-stack-layout">
+                    <div class="app-card-form">
+                        <h4><i class="fa-solid fa-circle-plus"></i> Allocate Cubicle</h4>
+                        <div class="input-group">
+                            <select id="seat-student-select" class="mobile-select"></select>
+                        </div>
+                        <div class="input-group">
+                            <input type="text" id="seat-number-input" placeholder="e.g. Seat-05, Seat-12">
+                        </div>
+                        <button class="btn check-in" style="width: 100%;" onclick="allocateSeat()"><i class="fa-solid fa-check"></i> Assign Desk</button>
+                    </div>
+
+                    <div class="app-card-list">
+                        <h4><i class="fa-solid fa-border-all"></i> Seating Grid Log</h4>
+                        <div class="table-responsive">
+                            <table class="log-table">
+                                <thead>
+                                    <tr>
+                                        <th>Seat ID</th>
+                                        <th>Occupant</th>
+                                        <th>Status</th>
+                                        <th>Operation</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="seat-table-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- PREMIUM BOTTOM NAVIGATION DOCK -->
+        <div class="bottom-nav">
+            <button id="tab-btn-attendance" class="nav-item active" onclick="switchTab('attendance')">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+                <span>Attendance</span>
+            </button>
+            <button id="tab-btn-admission" class="nav-item" onclick="switchTab('admission')">
+                <i class="fa-solid fa-user-group"></i>
+                <span>Admissions</span>
+            </button>
+            <button id="tab-btn-seats" class="nav-item" onclick="switchTab('seats')">
+                <i class="fa-solid fa-chair"></i>
+                <span>Seats</span>
+            </button>
+            <button id="tab-btn-security" class="nav-item" onclick="openPasswordModal()">
+                <i class="fa-solid fa-key"></i>
+                <span>Password</span>
+            </button>
+        </div>
+
+    </div>
+
+    <!-- Modals (History & Password) -->
+    <div id="historyModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Attendance History</h3>
+                <span class="close-btn" onclick="closeHistoryModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <h4 id="history-student-name" style="margin-bottom: 10px; color: var(--primary);"></h4>
+                <div class="table-responsive">
+                    <table class="log-table">
+                        <thead><tr><th>Date</th><th>Time</th><th>Activity</th></tr></thead>
+                        <tbody id="history-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="passwordModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Reset Credentials</h3>
+                <span class="close-btn" onclick="closePasswordModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="input-group"><input type="password" id="current-password-input" placeholder="Current Password"></div>
+                <div class="input-group"><input type="password" id="new-password-input" placeholder="New Password"></div>
+                <div class="input-group"><input type="password" id="confirm-password-input" placeholder="Confirm New Password"></div>
+                <button class="btn check-in" style="width: 100%;" onclick="updateAdminPassword()">Update Gateway</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+</html>
