@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Admin Workspace | Genius Library</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #122116; }
+        ::-webkit-scrollbar-thumb { background: #8c674b; border-radius: 10px; }
+        :root {
+            --dark-forest: #122116; --mid-green: #1d3224; --banner-dark: #192a1f;
+            --sage-green: #8ba882; --deep-brown: #36221c; --terracotta: #8c674b;
+            --cream-beige: #e5dec9; --text-glow: #fffae8; --gold-accent: #d9be9b;
+            --danger-red: #ef4444; --neon-green: #2ecc71;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; transition: all 0.25s ease; }
+        body { background-color: var(--dark-forest); color: #ffffff; min-height: 100vh; overflow-x: hidden; }
+        .hidden { display: none !important; }
+        .auth-container { display: flex; justify-content: center; align-items: center; min-height: 100vh; width: 100%; padding: 20px; }
+        .container { background: var(--mid-green); padding: 40px 30px; border-radius: 24px; width: 100%; max-width: 400px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.06); text-align: center; }
+        .portal-header h2 { font-family: 'Playfair Display', serif; font-size: 28px; color: var(--text-glow); margin: 15px 0 5px; }
+        .logo-icon { font-size: 36px; color: var(--gold-accent); }
+        .app-wrapper { width: 100%; min-height: 100vh; background-color: var(--dark-forest); display: flex; flex-direction: column; }
+        .app-top-bar { background-color: var(--banner-dark); padding: 20px 6%; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .top-brand h2 { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--text-glow); }
+        .top-actions { display: flex; align-items: center; gap: 20px; }
+        .noti-container { position: relative; }
+        .noti-bell-box { cursor: pointer; font-size: 18px; color: var(--gold-accent); position: relative; padding: 5px; }
+        .noti-badge { position: absolute; top: -5px; right: -5px; background: var(--danger-red); color: white; font-size: 10px; font-weight: 700; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .noti-dropdown { position: absolute; top: 50px; right: -20px; width: 280px; background: var(--mid-green); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); z-index: 100; overflow-y: auto; max-height: 320px; display: none; }
+        .noti-dropdown.show { display: block; }
+        .noti-drop-header { background: var(--banner-dark); padding: 12px; font-size: 12px; font-weight: 600; color: var(--gold-accent); }
+        .noti-item { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 12px; text-align: left; }
+        .noti-btn-row { display: flex; gap: 8px; margin-top: 8px; }
+        .top-icon-btn { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: var(--text-glow); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; cursor: pointer; }
+        .top-icon-btn:hover { background: var(--gold-accent); color: var(--dark-forest); }
+        .app-main-content { flex: 1; padding: 40px 6%; max-width: 1200px; width: 100%; margin: 0 auto; padding-bottom: 100px; }
+        .pane-header-title h3 { font-size: 20px; font-weight: 600; margin-bottom: 25px; color: var(--text-glow); border-left: 4px solid var(--gold-accent); padding-left: 12px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: var(--mid-green); padding: 22px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.04); }
+        .stat-card h3 { font-family: 'Playfair Display', serif; font-size: 32px; color: var(--text-glow); }
+        .stat-card p { font-size: 12px; color: rgba(255,255,255,0.6); text-transform: uppercase; }
+        .stat-card.green-card { border-left: 4px solid var(--sage-green); }
+        .stat-card.red-card { border-left: 4px solid var(--terracotta); }
+        .search-bar { position: relative; margin-bottom: 20px; display: flex; align-items: center; }
+        .search-icon { position: absolute; left: 15px; color: rgba(255,255,255,0.4); }
+        .search-bar input { background: var(--banner-dark); padding-left: 45px; }
+        .mobile-stack-layout { display: grid; grid-template-columns: 1fr 2fr; gap: 30px; }
+        .app-card-form { background: var(--mid-green); padding: 25px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); }
+        .table-card { background: var(--mid-green); border-radius: 20px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 25px; }
+        .table-responsive { width: 100%; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
+        th { background-color: var(--banner-dark); color: var(--gold-accent); padding: 15px; font-size: 11px; text-transform: uppercase; }
+        td { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.04); color: rgba(255,255,255,0.85); vertical-align: middle; }
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; font-size: 11px; color: var(--gold-accent); margin-bottom: 5px; text-transform: uppercase; }
+        input, select { width: 100%; padding: 12px 15px; background: var(--dark-forest); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; color: #ffffff; outline: none; }
+        input:focus, select:focus { border-color: var(--gold-accent); }
+        .btn { background: linear-gradient(135deg, #d9be9b, #bfa07a); color: #2b1f15; border: none; padding: 14px; font-weight: 600; border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; }
+        .btn.check-out { background: transparent; border: 1px solid var(--danger-red); color: var(--danger-red); margin-top: 15px; }
+        .btn-history { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: var(--text-glow); padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 12px; }
+        .approve-btn { background: var(--neon-green); color: var(--dark-forest); border: none; padding: 4px 10px; border-radius: 6px; font-weight: 600; cursor: pointer; }
+        .reject-btn { background: rgba(239, 68, 68, 0.2); color: var(--danger-red); border: 1px solid rgba(239, 68, 68, 0.3); padding: 4px 10px; border-radius: 6px; cursor: pointer; }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--banner-dark); display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid rgba(255,255,255,0.06); z-index: 99; }
+        .nav-item { background: none; border: none; color: rgba(255,255,255,0.4); display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; font-size: 11px; width: 20%; }
+        .nav-item.active { color: var(--gold-accent); }
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(18,33,22,0.8); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+        .modal-content { background: var(--mid-green); width: 90%; max-width: 550px; border-radius: 24px; padding: 25px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.08); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .close-btn { font-size: 24px; color: rgba(255,255,255,0.4); cursor: pointer; }
+
+        /* ⏱️ ELEGANT FLAT ROW TIMING BOXES */
+        .time-container-row { display: flex; align-items: center; gap: 8px; background: rgba(0, 0, 0, 0.2); padding: 6px 14px; border-radius: 12px; border: 1px solid rgba(217, 190, 155, 0.08); font-size: 12px; width: max-content; font-weight: 500; }
+        .time-pill { padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; text-transform: uppercase; }
+        .pill-in { background: rgba(46, 204, 113, 0.15); color: #2ecc71; border: 1px solid rgba(46, 204, 113, 0.2); }
+        .pill-out { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); }
+        
+        /* 💺 PREMIUM LEATHER-GOLD EMBOSSED CARDS FOR SEATS & ADMISSIONS */
+        .premium-seat-badge { background: linear-gradient(135deg, rgba(140, 103, 75, 0.25) 0%, rgba(54, 34, 28, 0.4) 100%); color: var(--gold-accent); padding: 8px 16px; border-radius: 12px; font-weight: 700; font-size: 13px; letter-spacing: 0.5px; border: 1px solid var(--terracotta); box-shadow: inset 0 0 8px rgba(217, 190, 155, 0.1), 0 4px 10px rgba(0,0,0,0.3); display: inline-flex; align-items: center; gap: 8px; min-width: 110px; }
+        .premium-seat-badge i { font-size: 12px; color: var(--text-glow); }
+        
+        .premium-student-box { background: linear-gradient(135deg, rgba(29, 50, 36, 0.6) 0%, rgba(18, 33, 22, 0.8) 100%); border: 1px solid rgba(217, 190, 155, 0.2); padding: 10px 16px; border-radius: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); display: inline-block; min-width: 160px; }
+
+        @media (max-width: 992px) { .stats-grid { grid-template-columns: repeat(2, 1fr) !important; } .mobile-stack-layout { grid-template-columns: 1fr; gap: 25px; } }
+    </style>
+</head>
+<body>
+    <!-- SECURITY LOCK GATE VIEW -->
+    <div class="auth-container" id="login-section">
+        <div class="container">
+            <div class="portal-header">
+                <div class="logo-icon"><i class="fa-solid fa-lock"></i></div>
+                <h2>Admin Workspace</h2>
+                <p style="color: rgba(255,255,255,0.5); font-size: 13px; margin-top:5px;">Secure Authentication Panel</p>
+            </div>
+            <div class="input-group" style="margin-top: 30px;">
+                <input type="password" id="adminPassword" placeholder="Enter Security Password">
+            </div>
+            <button class="btn" onclick="loginAdmin()"><i class="fa-solid fa-unlock"></i> Authenticate</button>
+            <p id="login-error" style="text-align: center; margin-top: 12px; font-size: 13px;"></p>
+        </div>
+    </div>
+
+    <!-- MAIN CONTROL HUB PANEL -->
+    <div class="app-wrapper hidden" id="dashboard-section">
+        <header class="app-top-bar">
+            <div class="top-brand"><h2>Workspace</h2></div>
+            <div class="top-actions">
+                <div class="noti-container">
+                    <div class="noti-bell-box" onclick="toggleNotificationDropdown()">
+                        <i class="fa-solid fa-bell"></i>
+                        <div class="noti-badge" id="bell-counter" style="display: none;">0</div>
+                    </div>
+                    <div class="noti-dropdown" id="notiDropdownMenu">
+                        <div class="noti-drop-header"><i class="fa-solid fa-envelope-open-text"></i> Pending Requests</div>
+                        <div id="dropdown-noti-list"></div>
+                        <div id="pending-empty" style="text-align:center; padding:20px; color:rgba(255,255,255,0.3); font-style:italic; font-size:12px;">No new requests.</div>
+                    </div>
+                </div>
+                <a href="index.html" class="top-icon-btn"><i class="fa-solid fa-arrow-left"></i></a>
+                <button class="top-icon-btn" onclick="logoutAdmin()"><i class="fa-solid fa-power-off"></i></button>
+            </div>
+        </header>
+
+        <main class="app-main-content">
+            <!-- TAB 1: OPERATIONAL LOGS MODULE -->
+            <div id="attendance-panel-section" class="workspace-pane">
+                <div class="pane-header-title"><h3><i class="fa-solid fa-calendar-check"></i> Live Attendance Tracking</h3></div>
+                <div class="stats-grid">
+                    <div class="stat-card green-card"><h3><span id="total-checkins">0</span></h3><p>Check-Ins Today</p></div>
+                    <div class="stat-card red-card"><h3><span id="total-checkouts">0</span></h3><p>Check-Outs Today</p></div>
+                    <div class="stat-card" style="border-left: 4px solid var(--gold-accent);"><h3><span id="total-occupied-seats">0</span></h3><p>Occupied Seats</p></div>
+                    <div class="stat-card" style="border-left: 4px solid #f59e0b;"><h3><span id="total-defaulters" style="color:#f59e0b;">0</span></h3><p>Fees Pending</p></div>
+                </div>
+                <div class="search-bar"><i class="fa-solid fa-magnifying-glass search-icon"></i><input type="text" id="searchHistory" placeholder="Search logs..." onkeyup="filterLogs()"></div>
+                <div class="table-card"><div class="table-responsive"><table><thead><tr><th>Student ID & Name</th><th>Latest Activity Today</th><th>Operation</th></tr></thead><tbody id="log-table-body"></tbody></table></div></div>
+                <button class="btn check-out" onclick="clearLogs()"><i class="fa-solid fa-trash-can"></i> Wipeout Logs</button>
+            </div>
+
+            <!-- TAB 2: SCHOLARS LEDGER MANAGEMENT -->
+            <div id="admission-panel-section" class="workspace-pane hidden">
+                <div class="pane-header-title"><h3><i class="fa-solid fa-users-gear"></i> Admissions & Finances center</h3></div>
+                <div class="mobile-stack-layout">
+                    <div class="app-card-form">
+                        <h4 style="margin-bottom:15px;"><i class="fa-solid fa-user-plus"></i> New Enrollment</h4>
+                        <div class="input-group"><input type="text" id="adm-name" placeholder="Student Name / Roll No."></div>
+                        <div class="input-group"><input type="date" id="adm-date"></div>
+                        <div class="input-group"><input type="tel" id="adm-phone" placeholder="Contact Mobile Number"></div>
+                        <div class="input-group"><input type="text" id="adm-address" placeholder="Residential Address"></div>
+                        <button class="btn" onclick="registerStudent()"><i class="fa-solid fa-save"></i> Save Profile</button>
+                    </div>
+                    <div class="table-card"><div class="table-responsive"><table><thead><tr><th>Scholar Token Box</th><th>Adm Date</th><th>Contact & Address</th><th>Fees</th><th>Action</th></tr></thead><tbody id="admission-table-body"></tbody></table></div></div>
+                </div>
+            </div>
+
+            <!-- TAB 3: SEAT CONTROLLER INVENTORY -->
+            <div id="seats-panel-section" class="workspace-pane hidden">
+                <div class="pane-header-title"><h3><i class="fa-solid fa-chair"></i> Seat Inventory Allocator</h3></div>
+                <div class="mobile-stack-layout">
+                    <div class="app-card-form">
+                        <h4 style="margin-bottom:15px;"><i class="fa-solid fa-circle-plus"></i> Allocate Desk Cabin</h4>
+                        <div class="input-group"><select id="seat-student-select"></select></div>
+                        <div class="input-group"><input type="number" id="seat-number-input" placeholder="Enter Seat Number Only"></div>
+                        <button class="btn" onclick="allocateSeat()"><i class="fa-solid fa-check"></i> Assign Desk</button>
+                    </div>
+                    <div class="table-card"><div class="table-responsive"><table><thead><tr><th>💺 Embossed ID</th><th>Occupant</th><th>Status</th><th>Operation</th></tr></thead><tbody id="seat-table-body"></tbody></table></div></div>
+                </div>
+            </div>
+        </main>
+
+        <div class="bottom-nav">
+            <button id="tab-btn-attendance" class="nav-item active" onclick="switchTab('attendance')"><i class="fa-solid fa-clock-rotate-left"></i><span>Attendance</span></button>
+            <button id="tab-btn-admission" class="nav-item" onclick="switchTab('admission')"><i class="fa-solid fa-user-group"></i><span>Admissions</span></button>
+            <button id="tab-btn-seats" class="nav-item" onclick="switchTab('seats')"><i class="fa-solid fa-chair"></i><span>Seats</span></button>
+            <button id="tab-btn-security" class="nav-item" onclick="openPasswordModal()"><i class="fa-solid fa-key"></i><span>Settings</span></button>
+        </div>
+    </div>
+
+    <!-- WINDOW MODALS LAYER -->
+    <div id="historyModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header"><h3>Merged Single-Row History</h3><span class="close-btn" onclick="closeHistoryModal()">×</span></div>
+            <div class="modal-body"><h4 id="history-student-name" style="margin-bottom:15px; color:var(--gold-accent);"></h4><div class="table-responsive"><table><thead><tr><th>Date Node</th><th>Timings Timeline Matrix</th></tr></thead><tbody id="history-table-body"></tbody></table></div></div>
+        </div>
+    </div>
+
+    <div id="passwordModal" class="modal hidden">
+        <div class="modal-content" style="max-width:440px;">
+            <div class="modal-header"><h3>System configurations center</h3><span class="close-btn" onclick="closePasswordModal()">×</span></div>
+            <div class="modal-body" style="max-height: 400px; overflow-y: auto;">
+                <div class="input-group"><label>Current Password</label><input type="password" id="current-password-input"></div>
+                <div class="input-group"><label>New Password</label><input type="password" id="new-password-input"></div>
+                <div class="input-group"><label>Total Library Capacity Seats</label><input type="number" id="cfg-total-seats"></div>
+                <div class="input-group"><label>Library Contact Phone</label><input type="tel" id="cfg-phone"></div>
+                <div class="input-group"><label>Official Library Email</label><input type="email" id="reg-email"></div>
+                <div class="input-group"><label>Physical Address / Coordinates</label><input type="text" id="reg-addr"></div>
+                <button class="btn" onclick="updateAdminConfig()">Commit System Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="studentProfileModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header"><h3>Scholar Profile Card</h3><span class="close-btn" onclick="closeProfileModal()">×</span></div>
+            <div id="profile-modal-body"></div>
+        </div>
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+</html>
